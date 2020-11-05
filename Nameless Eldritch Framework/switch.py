@@ -1,4 +1,3 @@
-#import player # was from player import Player
 
 class Switch:
     def switcher(self, case, player):
@@ -33,16 +32,3 @@ class Switch:
     def case_H(self, player):
         player.heal()## During battle, player health is updated, but then it is not updated here.
         return
-    
-    #def switcher = {
-    #            "N": player.move_north(),
-    #            "S": player.move_south(),
-    #            "E": player.move_east(),
-    #            "W": player.move_west(),
-                #"I": player.print_inventory()
-     #       }
-
-    #def switcher(case):
-     #   func = switcher.get(case, lambda: "nothing")
-     #   return func()
-        

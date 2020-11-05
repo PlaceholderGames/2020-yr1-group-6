@@ -3,12 +3,20 @@ import world
 
 class Player:
     def __init__(self):
-        self.inventory = [items.RustySword(), items.Rock(), items.Dagger(), items.Gold(5), items.CrustyBread(), items.GrannySmithApple()]
+        self.inventory = [items.RustySword(), 
+                        items.Rock(), 
+                        items.Dagger(), 
+                        items.CrustyBread(), 
+                        items.GrannySmithApple()]
 
-        self.x = 1
-        self.y = 2
+        self.x = world.start_tile_location[0]
+        self.y = world.start_tile_location[1]
         self.health = 100
+        self.gold = 5
+        self.victory = False
 
+    def is_alive(self):
+        return self.health > 0
 
     def __str__(self):
         return self.health
@@ -38,6 +46,7 @@ class Player:
         
         for item in self.inventory:
             print(str(item))
+        print("Gold: {}".format(self.gold))
         
         best_weapon = self.most_powerful_weapon()
 
@@ -97,3 +106,7 @@ class Player:
             except (ValueError, IndexError):
                 print("Invaild Choice, try again.")
         return self.health
+
+    def trade(self):
+        room = world.tile_at(self.x, self.y)
+        room.check_if_trade(self)
