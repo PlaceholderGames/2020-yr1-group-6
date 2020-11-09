@@ -47,16 +47,16 @@ class EnemyTile(MapTile):
         r = random.random()
 
         if r < 0.50:
-            self.enemy = enemies.Placeholder1_Enemy()
-            self.alive_text = "General entry description"
+            self.enemy = enemies.Rat()
+            self.alive_text = self.enemy.description
             self.death_text = "General death description"
         elif r < 0.80:
-            self.enemy = enemies.Placeholder2_Enemy()
-            self.alive_text = "General entry description"
+            self.enemy = enemies.Plant()
+            self.alive_text = self.enemy.description
             self.death_text = "General death description"
         else:
-            self.enemy = enemies.Placeholder3_Enemy()
-            self.alive_text = "General entry description"
+            self.enemy = enemies.Knight()
+            self.alive_text = self.enemy.description
             self.death_text = "General death description"
 
         super().__init__(x, y)
@@ -66,7 +66,8 @@ class EnemyTile(MapTile):
         death_exit_text = self.death_text
         print(alive_intro_text)
         if self.enemy.is_alive():
-            return "A {} awaits!".format(self.enemy.name)
+            print("A {} awaits!".format(self.enemy.name))
+            return "{} has {} health.".format(self.enemy.name, self.enemy.health)
         else:
             return "You've defeated the {}. \n".format(self.enemy.name) + death_exit_text
 
@@ -175,9 +176,15 @@ world_dsl = """
 |  |ST|  |
 """
 
-
+world_under_dsl = """
+|  |VT|  |
+|  |FG|  |
+|EN|FG|TT|
+|  |FG|  |
+"""
 
 world_map = []
+world_undermap = []
 #world_map = [
    # [None,VictoryTile(1,0), None],
   #  [None,BoringTile(1,1), None],
@@ -208,6 +215,24 @@ def parse_world_dsl():
 
         world_map.append(row)
 
+def parse_world_under_dsl():
+    #if not is_dsl_valid(world_dsl):
+    #    raise SyntaxError("DSL is invalid!")
+
+    dsl_lines = world_under_dsl.splitlines()
+    dsl_lines = [x for x in dsl_lines if x]
+
+    for y, dsl_row in enumerate(dsl_lines):
+        row = []
+        dsl_cells = dsl_row.split("|")
+        dsl_cells = [c for c in dsl_cells if c]
+
+        for x, dsl_cell in enumerate(dsl_cells):
+            tile_type = tile_type_dict[dsl_cell]
+            row.append(tile_type(x, y) if tile_type else None)
+
+        world_undermap.append(row)
+
 
 def is_dsl_valid(dsl):
     if dsl.count("|ST|") != 1:
@@ -225,11 +250,17 @@ def is_dsl_valid(dsl):
     
     return True
 
-def tile_at(x, y):# These x and y are not updating
+def tile_at(x, y, underswitch):
     if x < 0 or y < 0:
         return None
     
-    try:
-        return world_map[y][x]
-    except IndexError:
-        return None
+    if not underswitch:
+        try:
+            return world_map[y][x]
+        except IndexError:
+            return None
+    elif underswitch:
+        try:
+            return world_undermap[y][x]
+        except IndexError:
+            return None

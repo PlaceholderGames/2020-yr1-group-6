@@ -1,5 +1,8 @@
 import items
 import world
+import graphics
+
+player_model = graphics.Player()
 
 class Player:
     def __init__(self):
@@ -27,6 +30,7 @@ class Player:
 
     def move_north(self):
         self.move(dx = 0, dy = -1)
+        player_model.update("N")
         return (self.x, self.y)
 
     def move_south(self):
@@ -69,15 +73,50 @@ class Player:
         return (best_weapon, max_damage)
 
     def attack(self):
-        best_weapon, max_damage = self.most_powerful_weapon()
+        weapons = [item for item in self.inventory if isinstance(item, items.Weapon)]
+        choice = input("Would you like use your most powerful weapon?(Y/N)")
+        choice = choice.upper()
+        if choice == "Y":
+            weapon, max_damage = self.most_powerful_weapon()
+        else:
+            if not weapons:
+                print("You have no weapons to fight with!")
+                return
+
+            print("Choose your weapon to fight with:")
+
+            for i, item in enumerate(weapons, 1):
+                print("{}. {}".format(i, item))
+            
+            valid = False
+
+            while not valid:
+                numchoice = input("")
+                try:
+                    chosenweapon = weapons[int(numchoice) -1]
+                    print("Your weapon of choice is {}".format(chosenweapon.name))
+                    valid = True
+                except (ValueError, IndexError):
+                    print("Invaild choice, try again.")
+            
+                try:
+                    weapon = chosenweapon.name
+                    max_damage = chosenweapon.damage
+                except AttributeError:
+                    pass
+            
         room = world.tile_at(self.x, self.y)
         enemy = room.enemy
 
-        print("You use {} against {}!".format(best_weapon, enemy.name))
+        print("You use {} against {}!".format(weapon, enemy.name))
         enemy.health -= max_damage
 
         if not enemy.is_alive():
             print("You've killed {}!".format(enemy.name))
+            self.gold = self.gold + enemy.gold
+            enemy.gold -= enemy.gold
+            self.inventory.extend(enemy.inventory)
+            enemy.inventory = None
         else:
             print("{} HP is {}.".format(enemy.name, enemy.health))
     
@@ -104,9 +143,11 @@ class Player:
                 print("Current HP: {}".format(self.health))
                 valid = True
             except (ValueError, IndexError):
-                print("Invaild Choice, try again.")
+                print("Invaild choice, try again.")
         return self.health
 
     def trade(self):
         room = world.tile_at(self.x, self.y)
         room.check_if_trade(self)
+
+    

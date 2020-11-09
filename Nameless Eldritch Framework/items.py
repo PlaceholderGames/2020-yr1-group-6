@@ -69,3 +69,10 @@ class HealingPotion(Consumable):
         self.name = "Healing Potion"
         self.healing_value = 50
         self.value = 75
+
+class Berries(Consumable):
+    def __init__(self):
+        self.name = "Berries"
+        self.description = "Small but nutritious fruit that taste oddly sweet."
+        self.healing_value = 25
+        self.value = 55

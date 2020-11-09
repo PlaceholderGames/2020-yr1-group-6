@@ -1,4 +1,5 @@
 import items
+import randomise
 
 class NonPlayableCharacter():
     def __init__(self):
@@ -11,8 +12,5 @@ class Trader(NonPlayableCharacter):
     def __init__(self):
         self.name = "Trader1"
         self.gold = 100
-        self.inventory = [items.CrustyBread(),
-                        items.CrustyBread(),
-                        items.Rock(),
-                        items.GrannySmithApple(),
-                        items.HealingPotion()]
+        self.inventory = randomise.Random_Inventory.randomise_inventory(None, 5)
+        self.inventory.append(items.HealingPotion)
