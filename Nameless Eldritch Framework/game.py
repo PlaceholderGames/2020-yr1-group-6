@@ -2,32 +2,32 @@ from player import Player
 from switch import Switch
 from collections import OrderedDict
 import world
-import pygame
-import graphics
+#import pygame
+#import graphics
 
-from pygame.locals import (
-    RLEACCEL,
-    K_ESCAPE,
-    KEYDOWN,
-    QUIT,
-)
+#from pygame.locals import (
+#    RLEACCEL,
+#    K_ESCAPE,
+#    KEYDOWN,
+#    QUIT,
+#)
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+#SCREEN_WIDTH = 800
+#SCREEN_HEIGHT = 600
 
-pygame.mixer.init()
-pygame.init()
+#pygame.mixer.init()
+#pygame.init()
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-clock = pygame.time.Clock()
+#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+#clock = pygame.time.Clock()
 
 
-background = graphics.Street([0, 0])
-zone1 = pygame.sprite.Group()
-zone1.add(background)
-player_model = graphics.Player()
-all_sprites = pygame.sprite.Group()
-all_sprites.add(player_model)
+#background = graphics.Street([0, 0])
+#zone1 = pygame.sprite.Group()
+#zone1.add(background)
+#player_model = graphics.Player()
+#all_sprites = pygame.sprite.Group()
+#all_sprites.add(player_model)
 
 switch = Switch()
 underswitch = False
@@ -47,44 +47,43 @@ underswitch = False
 
 def play():
     print("Nameless Eldritch")
-    pygame.mixer.music.load("Audio/Game Audio Files/Zone1/nw-bg1.ogg")
-    pygame.mixer.music.play(loops=-1)
-    pygame.mixer.music.set_volume(0.1)
+    #pygame.mixer.music.load("Audio/Game Audio Files/Zone1/nw-bg1.ogg")
+   # pygame.mixer.music.play(loops=-1)
+    #pygame.mixer.music.set_volume(0.1)
     world.parse_world_dsl()
     world.parse_world_under_dsl()
     player = Player()
     
     while player.is_alive() and not player.victory:
 
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    quit
-            elif event.type == QUIT:
-                quit
+        #for event in pygame.event.get():
+           # if event.type == KEYDOWN:
+               # if event.key == K_ESCAPE:
+                 #   quit
+           # elif event.type == QUIT:
+              #  quit
         
-        screen.fill((0, 0, 0))
-        for entity in zone1:
-            screen.blit(entity.surf, entity.rect)
-        for entity in all_sprites:
-            screen.blit(entity.surf, entity.rect)
+        #screen.fill((0, 0, 0))
+       # for entity in zone1:
+        #    screen.blit(entity.surf, entity.rect)
+        #for entity in all_sprites:
+         #   screen.blit(entity.surf, entity.rect)
             
-        pygame.display.flip()
-        clock.tick(30)
+       # pygame.display.flip()
+        #clock.tick(30)
 
         room = world.tile_at(player.x, player.y, underswitch)
-        print(room.intro_text())
         room.modify_player(player)
-        #player.health = player.health
-        #game is changing player.health but not updating it globally to be used in switch
-        #add a code here to call something from world to add to the health
+        print(room.intro_text())
+        
+
         if player.is_alive() and not player.victory:
             action_input = choose_action(room, player)
         elif not player.is_alive():
             print("Through all you hard work, it seems it was all for nought.")
         #action_input = get_player_command()
         #action_input = action_input.upper() 
-        print(action_input)#Takes any input and converts it to upper case
+        #print(action_input)#Takes any input and converts it to upper case
         
  #       if action_input in ["I", "A", "H"]:
   #          switch.switcher(action_input, player)# The health in switch is different to player
@@ -148,6 +147,9 @@ def get_available_actions(room, player):
     if player.health < 100:
         action_adder(actions, 'H', player.heal, "Heal")
 
+    if isinstance(room, world.PuzzleTile) and not room.solved():
+        action_adder(actions, 'P', player.answer_puzzle, "Answer the puzzle" )
+
     return actions
 
 def action_adder(action_dict, hotkey, action, name, *args):
@@ -163,7 +165,12 @@ def choose_action(room, player):
         action_input = input("Action: ")
         action = available_actions.get(action_input)
 
-        if action:
+        
+        if action_input == 'A':
+            return action(underswitch)
+        elif action_input == 'P':
+            return action(underswitch)
+        elif action_input != 'A':
             return action()
         else:
             print("Invalid Action!")

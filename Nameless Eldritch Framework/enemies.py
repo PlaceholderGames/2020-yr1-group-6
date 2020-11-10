@@ -42,4 +42,5 @@ class Knight(Enemy):
         self.gold = 0
         self.inventory = randomise.Random_Inventory.randomise_inventory(None, 1) 
         self.inventory.append(items.RustySword())
+        self.inventory.append(items.DigitNote3())
         #self.inventory = [items.RustySword()]

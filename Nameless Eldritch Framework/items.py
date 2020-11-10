@@ -19,6 +19,13 @@ class AltConsumable:
     def __str__(self):
         return self.name + '(' + str(self.multiplyer) + ')'
 
+class NonConsumable:
+    def __init__(self):
+        raise NotImplementedError("Do not create raw NonConsumable objects.")
+    
+    def __str__(self):
+        return self.name + ' - ' + self.description
+
 class Rock(Weapon):
     def __init__(self):
         self.name = "Rock"
@@ -76,3 +83,24 @@ class Berries(Consumable):
         self.description = "Small but nutritious fruit that taste oddly sweet."
         self.healing_value = 25
         self.value = 55
+
+class DigitNote1(NonConsumable):
+    def __init__(self):
+        self.name = "Street Note 1"
+        self.description = " A small note you found in the street, it has the the number 6 written on it and a Circle. I wonder what it could be used for."
+
+class DigitNote2(NonConsumable):
+    def __init__(self):
+        self.name = "Street Note 2"
+        self.description = "A peice of paper found attached to a corpse. It has the number 3 written on it and a Triangle. I wonder what it could be used for."
+
+class DigitNote3(NonConsumable):
+    def __init__(self):
+        self.name = "Street Note 3"
+        self.description = "An offical looking document you took off the Knight. It has the number 9 written on it and a Square. I wonder what is could be used for."
+
+class Key(NonConsumable):
+    def __init__(self):
+        self.name = "Crooked Key"
+        self.description = "A small, almost broken key you found in a box. It looks like it might open something important."
+        

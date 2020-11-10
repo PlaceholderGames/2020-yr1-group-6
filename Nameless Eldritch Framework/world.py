@@ -2,6 +2,7 @@ import random
 import player
 import enemies
 import npc
+import items
 
 
 
@@ -24,40 +25,60 @@ class StartTile(MapTile):
         You can make out four paths, all equally filled with monsters and fire.
         """
 
-class BoringTile(MapTile):
+class StatueTile(MapTile):
     def intro_text(self):
         return """
-        This is a very dull part of the city, nothing
-        of interest here
+        A strong looking statue stands blocking the way.
+        It looks like it has some energy inside.
+        Maybe in another world this was a strong foe.
         """
 
 class VictoryTile(MapTile):
+    def __init__(self, x, y):
+        self.key_check = False
+        super().__init__(x, y)
+
+
     def modify_player(self, player):
-        player.victory = True
+        for items in player.inventory:
+            if items.name == "Crooked Key":
+                self.key_check = True
+                player.victory = True
     def intro_text(self):
-        return """
-        You have grown weary but you 
-        finally see a sign in the distance...
-        It reads "Now Entering Aurora", 
-        finally you are out of the city!
-        """
+        #solved = PuzzleTile.solved
+        
+        if self.key_check == True:
+            return """
+            You use the small key on the gate, and it opens!
+            You have grown weary but you 
+            finally see a sign in the distance...
+            It reads "Now Entering Aurora", 
+            finally you are out of the city!
+            """
+        else:
+            return """
+            You find a locked gate with a sign outsde.
+            It looks like a small key may open the gate.
+            For now there is nothing you can do
+            """
 
 class EnemyTile(MapTile):
     def __init__(self, x, y):
-        r = random.random()
+        #r = random.random()
+        
 
-        if r < 0.50:
-            self.enemy = enemies.Rat()
-            self.alive_text = self.enemy.description
-            self.death_text = "General death description"
-        elif r < 0.80:
-            self.enemy = enemies.Plant()
-            self.alive_text = self.enemy.description
-            self.death_text = "General death description"
-        else:
-            self.enemy = enemies.Knight()
-            self.alive_text = self.enemy.description
-            self.death_text = "General death description"
+        #if r < 0.50:
+           # self.enemy = enemies.Rat()
+           # self.alive_text = self.enemy.description
+            #self.death_text = "General death description"
+        #elif r < 0.80:
+           # self.enemy = enemies.Plant()
+            #self.alive_text = self.enemy.description
+            #self.death_text = "General death description"
+        #else:
+        self.enemy = enemies.Knight()
+        self.alive_text = self.enemy.description
+        self.death_text = "I wish to take hounour in death."
 
         super().__init__(x, y)
 
@@ -73,8 +94,7 @@ class EnemyTile(MapTile):
 
     def modify_player(self, player):
         if self.enemy.is_alive():
-            player.health = player.health - self.enemy.damage#Health here isn't updating
-            #Player health isn't updating after healing
+            player.health = player.health - self.enemy.damage
             print("{} does {} damage. You have {} HP remaining.".format(self.enemy.name, self.enemy.damage, player.health))
             return player.health
 
@@ -161,23 +181,101 @@ class FindGoldTile(MapTile):
             find some gold!
             """
 
+class PuzzleItemTile1(MapTile):
+    def __init__(self, x, y):
+        #self.inventory = [items.DigitNote1, items.DigitNote2]
+        self.note_1_claimed = False
+        super().__init__(x, y)
+    
+    def modify_player(self, player):
+        if not self.note_1_claimed:
+            self.note_1_claimed = True
+            player.inventory.append(items.DigitNote1())
+            #self.inventory.remove(self.inventory[0])
+
+    def intro_text(self):
+        if self.note_1_claimed == True:
+            return """
+            There's nothing of interest left here, 
+            look elsewhere in the street.
+            """
+        else:
+            return """
+            You find a torn peice of paper stuck on a wall.
+            You pick it up and it has a number and a symbol on it.
+            This might be useful later on.
+            """
+
+class PuzzleItemTile2(MapTile):
+    def __init__(self, x, y):
+        #self.inventory = [items.DigitNote1, items.DigitNote2]
+        self.note_2_claimed = False
+        super().__init__(x, y)
+    
+    def modify_player(self, player):
+        if not self.note_2_claimed:
+            self.note_2_claimed = True
+            player.inventory.append(items.DigitNote2())
+            #self.inventory.remove(self.inventory[0])
+
+    def intro_text(self):
+        if self.note_2_claimed == True:
+            return """
+            There's nothing of interest left here, 
+            look elsewhere in the street.
+            """
+        else:
+            return """
+            You find a torn peice of paper attached to a rotting corpse.
+            You pick it up and it has a number and a symbol on it.
+            This might be useful later on.
+            """
+
+class PuzzleTile(MapTile):
+    def __init__(self, x, y):
+        self.puzzle_solved = False
+        super().__init__(x, y)
+        
+
+    def intro_text(self):
+        if self.puzzle_solved == True:
+            return """
+            An empty box lies here, look around and
+            you might be able to use the key somewhere!
+            """
+        else:
+            return """
+            You find a locked box beneath your feet.
+            It has a Triangle, Circle and a Square,
+            with number dials underneath. 
+            You might be able to open it if you know the code.
+            """
+
+    def solved(self):
+        return self.puzzle_solved
+
+
+
 tile_type_dict = {"VT": VictoryTile,
                   "EN": EnemyTile,
                   "ST": StartTile,
-                  "BT": BoringTile,
+                  "SU": StatueTile,
                   "TT": TraderTile,
                   "FG": FindGoldTile,
+                  "P1": PuzzleItemTile1,
+                  "P2": PuzzleItemTile2,
+                  "PT": PuzzleTile,
                   "  ": None}
 
 world_dsl = """
-|  |VT|  |
-|  |FG|  |
-|EN|FG|TT|
+|P2|VT|  |
+|P1|PT|  |
+|SU|FG|TT|
 |  |ST|  |
 """
 
 world_under_dsl = """
-|  |VT|  |
+|  |  |  |
 |  |FG|  |
 |EN|FG|TT|
 |  |FG|  |

@@ -45,6 +45,20 @@ class Player:
         self.move(dx = -1, dy = 0)
         return (self.x, self.y)
 
+    def answer_puzzle(self, underswitch):
+        room = world.tile_at(self.x, self.y, underswitch)
+        if not room.solved():
+            action_input = input("Answer: ")
+
+            if action_input != ("369"):
+                print("Incorrect Answer, try again")
+            else:
+                print("The box opens up to reveal a key, you pick it up")
+                self.inventory.append(items.Key())
+                room.puzzle_solved = True
+
+                
+
     def print_inventory(self):
         print("Inventory: \n")
         
@@ -52,7 +66,7 @@ class Player:
             print(str(item))
         print("Gold: {}".format(self.gold))
         
-        best_weapon = self.most_powerful_weapon()
+        best_weapon, max_damage = self.most_powerful_weapon()
 
         print("Your best weapon is your {}".format(best_weapon))
 
@@ -72,7 +86,7 @@ class Player:
 
         return (best_weapon, max_damage)
 
-    def attack(self):
+    def attack(self, underswitch):
         weapons = [item for item in self.inventory if isinstance(item, items.Weapon)]
         choice = input("Would you like use your most powerful weapon?(Y/N)")
         choice = choice.upper()
@@ -105,7 +119,7 @@ class Player:
                 except AttributeError:
                     pass
             
-        room = world.tile_at(self.x, self.y)
+        room = world.tile_at(self.x, self.y, underswitch)
         enemy = room.enemy
 
         print("You use {} against {}!".format(weapon, enemy.name))

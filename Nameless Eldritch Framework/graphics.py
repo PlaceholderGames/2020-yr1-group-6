@@ -22,13 +22,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
 
     def update(self, action):
-        if action == "W":
+        if action == 'W':
             self.rect.move_ip(0, -5)
-        if action == "E":
+        if action == 'E':
             self.rect.move_ip(0, 5)
-        if action == "N":
+        if action == 'N':
             self.rect.move_ip(-5, 0)
-        if action == "S":
+        if action == 'S':
             self.rect.move_ip(5, 0)
 
         if self.rect.left < 0:
