@@ -1,26 +1,106 @@
+import pygame
+#from pygame import mixer
+from enum import Enum
+
 from player import Player
 from switch import Switch
 from collections import OrderedDict
 import world
-#import pygame
+
 #import graphics
 
-#from pygame.locals import (
-#    RLEACCEL,
-#    K_ESCAPE,
-#    KEYDOWN,
-#    QUIT,
-#)
+from pygame.locals import *
 
-#SCREEN_WIDTH = 800
-#SCREEN_HEIGHT = 600
+pygame.font.init()
+
+myfont = pygame.font.SysFont('Comic Sans MS', 30)
+                 
+pygame.init()
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 #pygame.mixer.init()
-#pygame.init()
 
-#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-#clock = pygame.time.Clock()
 
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Nameless Eldritch") 
+
+clock = pygame.time.Clock()
+
+screen.fill((0, 0, 0))
+
+class GameState:
+    NONE = 0
+    RUNNING = 1
+    QUIT = 2
+    
+class Game:
+    def __init__(self,screenWindow):
+        self.screen = screenWindow
+        self.status = GameState.NONE
+        self.keyPressed = None
+
+    def start(self):
+        #player = Player()
+        self.status = GameState.RUNNING
+
+    def update(self):
+        self.screen.fill((0, 0, 0))
+        self.handleEvents()
+        #self.updateMap()
+        self.updateScreen()
+
+    def handleEvents(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.status = GameState.QUIT
+
+            elif event.type == pygame.KEYDOWN:
+                self.keyPressed = None
+                if event.key == pygame.K_ESCAPE:
+                    self.status = GameState.QUIT
+                elif event.key == pygame.K_n:
+                    print('Player chose N')
+                    self.keyPressed = "N"
+                elif event.key == pygame.K_s:
+                    print('Player chose S')
+                    self.keyPressed = "S"
+                elif event.key == pygame.K_e:
+                    print('Player chose E')
+                    self.keyPressed = "E"
+                elif event.key == pygame.K_w:
+                    print('Player chose W')
+                    self.keyPressed = "W"
+                elif event.key == pygame.K_i:
+                    print('Player chose I')
+                    self.keyPressed = "I"
+                else:
+                    print('Invalid option chosen')
+
+#    def updateMap(self):
+#        if player.is_alive() and not player.victory:
+#            room = world.tile_at(player.x, player.y, underswitch)
+#            room.modify_player(player)
+#            print(room.intro_text())
+#        elif not player.is_alive():
+#            print("Through all you hard work, it seems it was all for nought.")
+#            game.status = GameState.QUIT
+
+    def updateScreen(self):
+        screen.fill((255, 255, 255))
+        textsurface = myfont.render(self.keyPressed, False, (0, 0, 0))
+        screen.blit(textsurface,(0,0))
+        
+game = Game(screen)
+game.start()
+
+while game.status == GameState.RUNNING:
+    clock.tick(60)
+    game.update()
+    pygame.display.flip()
+
+pygame.quit()
 
 #background = graphics.Street([0, 0])
 #zone1 = pygame.sprite.Group()
@@ -28,21 +108,6 @@ import world
 #player_model = graphics.Player()
 #all_sprites = pygame.sprite.Group()
 #all_sprites.add(player_model)
-
-switch = Switch()
-underswitch = False
-#def switch(case):
-    #switcher = {
-        #"N": player.move_north(),
-        #"S": player.move_south(),W
-        #"E": player.move_east(),
-        #"W": player.move_west()
-        #"I": player.print_inventory()
-        
-    #}
-    #func = switcher.get(case, lambda: "Invalid Command")
-    #return func()
-    #return switcher.get(case, lambda: "Invalid Command")
 
 
 def play():
@@ -174,4 +239,5 @@ def choose_action(room, player):
             return action()
         else:
             print("Invalid Action!")
-play()
+#play()
+pygame.quit()
